@@ -92,7 +92,7 @@ function DataFilter({
         key={index}
         onClick={handleSelectClick}
         value={selector.value}
-        active={actualSelector == selector.value}
+        active={actualSelector === selector.value}
       >
         {selector.label}
       </Button>

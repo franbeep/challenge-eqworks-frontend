@@ -23,12 +23,13 @@ const Section = styled.div`
   margin-bottom: 1em;
 `;
 
-const BaseURI = 'https://lucky-neat-bamboo.glitch.me';
+const BaseURI = `${process.env.BACKEND}`;
 
 function LandingPage() {
   const [selector, setSelector] = React.useState(null);
   const [chartRawData, setChartRawData] = React.useState([]);
   const [tableRawData, setTableRawData] = React.useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [range, setRange] = React.useState({ startDate: null, endDate: null });
 
   React.useEffect(() => {
