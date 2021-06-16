@@ -29,7 +29,8 @@ const Button = styled.button`
   padding: 1em;
   padding-top: 0.5em;
   padding-bottom: 0.5em;
-  background: transparent;
+  background: ${props =>
+    props.active ? 'rgba(5, 150, 105, 0.8)' : 'transparent'};
   border: rgba(75, 85, 99, 0.15) 1px solid;
   color: rgba(0, 0, 0, 0.6);
   margin-left: -1px;
@@ -65,6 +66,9 @@ const SearchField = styled.div`
 const SearchFieldInput = styled(DateRangeInput)``;
 const SearchFieldSubmitButton = styled(Button)``;
 
+/**
+ * Multi visualization widget to filter data
+ */
 function DataFilter({
   actualSelector,
   selectors = [],
@@ -73,17 +77,27 @@ function DataFilter({
   dateRangeUpdated,
   searchField = false,
   searchFieldSubmit,
+  selectsRange = true,
 }) {
   const [search, setSearch] = React.useState('');
-  const [startDate, setStartDate] = React.useState(new Date());
+  const [startDate, setStartDate] = React.useState(null);
   const [endDate, setEndDate] = React.useState(null);
-  const onChangeDate = dates => {
+
+  // handler for date range filtering
+  const onChangeDateRange = dates => {
     const [start, end] = dates;
     setStartDate(start);
     setEndDate(end);
     if (end != null) dateRangeUpdated({ startDate: start, endDate: end });
   };
 
+  // handler for single date filtering
+  const onChangeDate = date => {
+    setStartDate(date);
+    dateRangeUpdated({ startDate: date, endDate: null });
+  };
+
+  // handler for selector pressed
   const handleSelectClick = evt => selectorPressed(evt.target.value);
 
   const buttons = selectors.map((selector, index) => {
@@ -106,14 +120,14 @@ function DataFilter({
         <DateRange>
           <DatePicker
             selected={startDate}
-            onChange={onChangeDate}
+            onChange={selectsRange ? onChangeDateRange : onChangeDate}
             startDate={startDate}
             endDate={endDate}
-            selectsRange
-            // inline
+            selectsRange={selectsRange}
+            placeholderText={
+              selectsRange ? 'Select a date range' : 'Select a date'
+            }
             customInput={<DateRangeInput />}
-            // includeDates={[new Date(), addDays(new Date(), 1)]}
-            // calendarClassName="rasta-stripes"
           />
         </DateRange>
       )}
@@ -145,6 +159,7 @@ DataFilter.propTypes = {
   dateRangeUpdated: PropTypes.func,
   searchField: PropTypes.bool,
   searchFieldSubmit: PropTypes.func,
+  selectsRange: PropTypes.bool,
 };
 
 export default DataFilter;

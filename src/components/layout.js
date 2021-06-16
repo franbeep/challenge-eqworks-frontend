@@ -29,6 +29,9 @@ const Main = styled.main`
   flex-direction: row;
 `;
 
+/**
+ * Base layout of the landing page
+ */
 function Layout({ children }) {
   return (
     <Main>

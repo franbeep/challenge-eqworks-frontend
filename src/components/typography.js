@@ -22,6 +22,9 @@ const Paragraph = styled.p`
   margin-bottom: 0;
 `;
 
+/**
+ * Typography helper for any text needed
+ */
 function Typography({ type, children, ...rest }) {
   switch (type) {
     case 'heading':

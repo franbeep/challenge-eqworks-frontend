@@ -3,9 +3,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Chart, registerables } from 'chart.js';
+import { interval, Subject } from 'rxjs';
+import { debounce } from 'rxjs/operators';
 
 Chart.register(...registerables);
 
+/**
+ * Simple utility function for the chart gradient
+ * @param {String} color Accepts: red, yellow, green, blue, indigo, purple, pink, grey
+ * @returns
+ */
 const getColorSet = color => {
   switch (color) {
     case 'red':
@@ -71,7 +78,11 @@ const Canvas = styled.canvas`
   width: 100%;
   height: 100%;
 `;
+const subject = new Subject();
 
+/**
+ * Chart component that encapsulates Chart.js with some utilities involving date, gradient and more
+ */
 function LineChart({
   pointLabel,
   labels,
@@ -82,8 +93,10 @@ function LineChart({
   dashed = false,
 }) {
   const chartRef = React.useRef(null);
+  const [chart, setChart] = React.useState(null);
 
-  React.useEffect(() => {
+  // Updates the chart, destroying the previously created
+  const updateChart = () => {
     const ctx = chartRef.current.getContext('2d');
     const datasets = [];
 
@@ -117,6 +130,7 @@ function LineChart({
       });
     }
 
+    // second dataset, if any
     if (altData) {
       const { colorValue, gradientFrom, gradientTo } = getColorSet(altColor);
       const gradient = ctx.createLinearGradient(0, 0, 0, 400);
@@ -149,10 +163,28 @@ function LineChart({
       datasets,
     };
 
-    new Chart(ctx, {
+    // destroy previous and create a new one
+    if (chart) {
+      chart.destroy();
+    }
+    const newChart = new Chart(ctx, {
       type: 'line',
       data: chartData,
     });
+    setChart(newChart);
+  };
+
+  // update chart every time labels or data change
+  React.useEffect(() => {
+    subject.next(updateChart);
+  }, [labels, data, altData]);
+
+  // create a stream to debounce in case of many refreshes
+  // ...and also create first (empty) chart
+  React.useEffect(() => {
+    const stream = subject.pipe(debounce(() => interval(500)));
+    stream.subscribe(f => f());
+    subject.next(updateChart);
   }, []);
 
   return (

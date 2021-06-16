@@ -7,6 +7,7 @@ import '@fontsource/roboto';
 const Container = styled.table`
   padding: 1em;
   font-family: 'Roboto';
+  width: 100%;
 `;
 const Header = styled.thead`
   //
@@ -51,14 +52,19 @@ const Data = styled.td`
   //
 `;
 
+/**
+ * Table component for data visualization
+ */
 function Table({ labels, data }) {
-  const header = labels.map(item => (
-    <HeaderData alignText="left">{item.label}</HeaderData>
+  const header = labels.map((item, index) => (
+    <HeaderData key={index} alignText="left">
+      {item.label}
+    </HeaderData>
   ));
-  const rows = data.map(values => (
-    <Row>
-      {values.map(value => (
-        <Data>{value}</Data>
+  const rows = data.map((values, row) => (
+    <Row key={row}>
+      {values.map((value, data) => (
+        <Data key={data}>{value}</Data>
       ))}
     </Row>
   ));
@@ -74,15 +80,10 @@ function Table({ labels, data }) {
 }
 
 Table.propTypes = {
-  labels: PropTypes.arrayOf(PropTypes.string),
-  data: PropTypes.arrayOf(PropTypes.string),
+  labels: PropTypes.arrayOf(
+    PropTypes.shape({ label: PropTypes.string, key: PropTypes.string })
+  ),
+  data: PropTypes.arrayOf(PropTypes.any),
 };
-
-// export const parseDateToTable = (str, format = 'D MMMM YYYY') => {
-//   return moment(new Date(str)).format(format);
-// };
-// export const parseFloatToTable = str => {
-//   return parseFloat(str).toFixed(2);
-// };
 
 export default Table;

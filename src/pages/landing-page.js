@@ -23,68 +23,91 @@ const Section = styled.div`
   margin-bottom: 1em;
 `;
 
-const BaseURI = `${process.env.BACKEND}`;
+// const BaseURI = `http://127.0.0.1:5555`;
+// backend
+const BaseURI = `https://lucky-neat-bamboo.glitch.me`;
+
+const LineChartMemoized = React.memo(LineChart);
 
 function LandingPage() {
-  const [selector, setSelector] = React.useState(null);
+  const [selector, setSelector] = React.useState('daily');
   const [chartRawData, setChartRawData] = React.useState([]);
   const [tableRawData, setTableRawData] = React.useState([]);
   // eslint-disable-next-line no-unused-vars
   const [range, setRange] = React.useState({ startDate: null, endDate: null });
 
+  // chart updates
   React.useEffect(() => {
     if (selector == null) return;
 
-    async function updateData() {
-      const data = await axios.get(`${BaseURI}/events/${selector}`);
-      setChartRawData(data);
-    }
-    updateData();
-  }, [selector]);
+    const params = {
+      startDate: range.startDate
+        ? range.startDate.toLocaleDateString('en-CA')
+        : undefined,
+      endDate: range.endDate
+        ? range.endDate.toLocaleDateString('en-CA')
+        : undefined,
+    };
 
+    axios
+      .get(`${BaseURI}/events/${selector}`, { params })
+      .then(response => setChartRawData(response.data))
+      .catch(err => console.error(err));
+  }, [selector, range]);
+
+  // table updates
   React.useEffect(() => {
-    async function updateData() {
-      const data = await axios.get(`${BaseURI}/stats/daily`);
-      setTableRawData(data);
-    }
-    updateData();
+    axios
+      .get(`${BaseURI}/stats/daily`)
+      .then(response => setTableRawData(response.data))
+      .catch(err => console.error(err));
   }, []);
 
-  const handleSelectorSelected = value => setSelector(value);
+  // handler for when selects a selector
+  const handleSelectorSelected = value => {
+    const initialDate = new Date('2017-01-05');
 
+    setSelector(value);
+    setRange({
+      startDate: initialDate,
+      endDate: null,
+    });
+  };
+
+  // handler for selecting a date
   const handleDateRangeChanged = ({ startDate, endDate }) =>
     setRange({ startDate, endDate });
 
+  // processes the raw data into labels and data
   let chartData = [],
     chartLabels = [];
   let tableData = [],
     tableLabels = [];
 
-  if (chartRawData.length > 0) {
-    switch (selector) {
-      case 'daily':
-        chartLabels = chartRawData.map(
-          d => `${new Date(d.date).toLocaleDateString('en-US')}`
-        );
-        chartData = chartRawData.map(d => d.events);
-        break;
-      case 'hourly':
-        chartLabels = chartRawData.map(d => `${d.hour}h`);
-        chartData = chartRawData.map(d => d.events);
-        break;
-      default:
-        break;
-    }
+  // ...chart data processing
+  switch (selector) {
+    case 'daily':
+      chartLabels = chartRawData.map(
+        d => `${new Date(d.date).toLocaleDateString('en-US')}`
+      );
+      chartData = chartRawData.map(d => d.events);
+      break;
+    case 'hourly':
+      chartLabels = chartRawData.map(d => `${d.hour}h`);
+      chartData = chartRawData.map(d => d.events);
+      break;
+    default:
+      break;
   }
 
+  // ...table data processing
   if (tableRawData.length > 0) {
     tableLabels = Object.keys(tableRawData[0]).map(key => ({
       label: key.replace(/([A-Z])/g, ' $1'),
       key,
     }));
-    tableLabels = tableRawData.map(item => [
+    tableData = tableRawData.map(item => [
       new Date(item.date).toLocaleDateString('en-US'),
-      item.hour,
       item.impressions,
       item.clicks,
       parseFloat(item.revenue).toFixed(2),
@@ -116,17 +139,13 @@ function LandingPage() {
             selectorPressed={handleSelectorSelected}
             dateRange
             dateRangeUpdated={handleDateRangeChanged}
+            selectsRange={selector === 'daily'}
           />
-          {/* LineChart */}
-          <LineChart
+          <LineChartMemoized
             pointLabel={'# of Events:'}
             labels={chartLabels}
             data={chartData}
             color="green"
-            // labels,
-            // data: dataTwo,
-            // color: 'indigo',
-            // dashed: true,
           />
         </Section>
 
