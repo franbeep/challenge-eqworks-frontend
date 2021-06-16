@@ -39,6 +39,6 @@
 
 <h2>Screenshots</h2>
 
-<img alt="Netlify Status" src="screenshots/mobile.jpg" width="500">
+<img alt="Netlify Status" src="screenshots/desktop.jpg" width="500">
 
 <h3>Thanks! ❤️</h3>
