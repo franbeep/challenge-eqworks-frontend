@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Chart, registerables } from 'chart.js';
 import { interval, Subject } from 'rxjs';
-import { debounce, debounceTime } from 'rxjs/operators';
+import { debounce } from 'rxjs/operators';
 
 import Typography from './typography';
 
@@ -95,7 +95,7 @@ const ErrorModal = styled.div`
 `;
 
 const subject = new Subject();
-const DEBOUNCE_INTERVAL = 500;
+const DEBOUNCE_INTERVAL = 150;
 // create a stream to debounce in case of many refreshes
 const stream = subject.pipe(debounce(() => interval(DEBOUNCE_INTERVAL)));
 stream.subscribe(f => f());

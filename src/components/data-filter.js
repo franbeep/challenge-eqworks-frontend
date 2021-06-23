@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
+import { interval, Subject } from 'rxjs';
+import { debounce } from 'rxjs/operators';
 import 'react-datepicker/dist/react-datepicker.css';
 import '@fontsource/roboto';
 
@@ -64,18 +66,17 @@ const DateRangeInput = styled.input`
 const SearchField = styled.div`
   align-self: flex-end;
 `;
-const SearchFieldInput = styled(DateRangeInput)`
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
-`;
+const SearchFieldInput = styled(DateRangeInput)``;
 const SearchFieldSubmitButton = styled(Button)`
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
 `;
-const RefreshDiv = styled.div``;
-const RefreshButton = styled(Button)``;
+
+const subject = new Subject();
+const DEBOUNCE_INTERVAL = 100;
+// create a stream to debounce in case of many refreshes
+const stream = subject.pipe(debounce(() => interval(DEBOUNCE_INTERVAL)));
+stream.subscribe(f => f());
 
 /**
  * Multi visualization widget to filter data
@@ -89,7 +90,6 @@ function DataFilter({
   searchField = false,
   searchFieldSubmit,
   selectsRange = true,
-  refreshCall,
 }) {
   const [search, setSearch] = React.useState('');
   const [startDate, setStartDate] = React.useState(null);
@@ -146,18 +146,14 @@ function DataFilter({
       {searchField && (
         <SearchField>
           <SearchFieldInput
-            value={search}
-            onChange={evt => setSearch(evt.target.value)}
+            placeholder="Search by keyword..."
+            onChange={evt =>
+              subject.next(() => {
+                searchFieldSubmit(evt.target.value);
+              })
+            }
           />
-          <SearchFieldSubmitButton onClick={() => searchFieldSubmit(search)}>
-            Submit
-          </SearchFieldSubmitButton>
         </SearchField>
-      )}
-      {refreshCall && (
-        <RefreshDiv>
-          <RefreshButton></RefreshButton>
-        </RefreshDiv>
       )}
     </Container>
   );
@@ -177,7 +173,6 @@ DataFilter.propTypes = {
   searchField: PropTypes.bool,
   searchFieldSubmit: PropTypes.func,
   selectsRange: PropTypes.bool,
-  refreshCall: PropTypes.func,
 };
 
 export default DataFilter;
