@@ -96,3 +96,16 @@ NoData.args = {
   data: [],
   color: 'purple',
 };
+
+export const ErrorStory = Template.bind({});
+ErrorStory.storyName = 'Error';
+ErrorStory.args = {
+  pointLabel: '# of Events:',
+  labels,
+  data: [],
+  color: 'pink',
+  error: {
+    status: '429',
+    message: "You're not allowed to do this.",
+  },
+};

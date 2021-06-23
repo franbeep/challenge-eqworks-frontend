@@ -12,7 +12,7 @@ export default {
   },
   decorators: [
     Story => (
-      <div style={{ maxWidth: '900px' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         <Story />
       </div>
     ),

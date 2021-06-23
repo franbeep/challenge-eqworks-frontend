@@ -1,4 +1,4 @@
-import Table from './table';
+import Table, { placeholder } from './table';
 // import moment from 'moment';
 
 export default {
@@ -210,6 +210,15 @@ Default.args = {
 export const NoData = Template.bind({});
 NoData.storyName = 'No Data';
 NoData.args = {
-  labels,
-  data: [],
+  ...placeholder,
+};
+
+export const ErrorStory = Template.bind({});
+ErrorStory.storyName = 'Error';
+ErrorStory.args = {
+  ...placeholder,
+  error: {
+    status: '429',
+    message: "You're not allowed to do this.",
+  },
 };

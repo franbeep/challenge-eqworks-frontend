@@ -6,6 +6,8 @@ import { Chart, registerables } from 'chart.js';
 import { interval, Subject } from 'rxjs';
 import { debounce, debounceTime } from 'rxjs/operators';
 
+import Typography from './typography';
+
 Chart.register(...registerables);
 
 /**
@@ -72,11 +74,24 @@ const getColorSet = color => {
   }
 };
 
-const Container = styled.div``;
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const Canvas = styled.canvas`
   width: 100%;
   height: 100%;
+`;
+const ErrorModal = styled.div`
+  position: absolute;
+  border-radius: 4px;
+  background: white;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+  max-width: 250px;
 `;
 
 const subject = new Subject();
@@ -96,6 +111,7 @@ function LineChart({
   color,
   altColor = 'grey',
   dashed = false,
+  error,
 }) {
   const chartRef = React.useRef(null);
   const [chart, setChart] = React.useState(null);
@@ -192,7 +208,16 @@ function LineChart({
 
   return (
     <Container>
-      <Canvas ref={chartRef} />
+      <Canvas
+        ref={chartRef}
+        style={{ filter: Boolean(error) ? 'blur(4px)' : '' }}
+      />
+      {error && (
+        <ErrorModal>
+          <Typography type="title">{error.status}</Typography>
+          <Typography type="paragraph">{error.message}</Typography>
+        </ErrorModal>
+      )}
     </Container>
   );
 }
@@ -222,6 +247,10 @@ LineChart.propTypes = {
     'pink',
   ]),
   dashed: PropTypes.bool,
+  error: PropTypes.shape({
+    status: PropTypes.string,
+    message: PropTypes.string,
+  }),
 };
 
 export default LineChart;

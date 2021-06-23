@@ -74,6 +74,8 @@ const SearchFieldSubmitButton = styled(Button)`
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
 `;
+const RefreshDiv = styled.div``;
+const RefreshButton = styled(Button)``;
 
 /**
  * Multi visualization widget to filter data
@@ -87,6 +89,7 @@ function DataFilter({
   searchField = false,
   searchFieldSubmit,
   selectsRange = true,
+  refreshCall,
 }) {
   const [search, setSearch] = React.useState('');
   const [startDate, setStartDate] = React.useState(null);
@@ -151,6 +154,11 @@ function DataFilter({
           </SearchFieldSubmitButton>
         </SearchField>
       )}
+      {refreshCall && (
+        <RefreshDiv>
+          <RefreshButton></RefreshButton>
+        </RefreshDiv>
+      )}
     </Container>
   );
 }
@@ -169,6 +177,7 @@ DataFilter.propTypes = {
   searchField: PropTypes.bool,
   searchFieldSubmit: PropTypes.func,
   selectsRange: PropTypes.bool,
+  refreshCall: PropTypes.func,
 };
 
 export default DataFilter;
