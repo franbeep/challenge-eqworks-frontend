@@ -54,6 +54,7 @@ const DateRangeInput = styled.input`
   color: rgba(0, 0, 0, 0.6);
   margin-left: -1px;
   transition: 0.3s;
+  border-radius: 4px;
   &:hover,
   &:focus {
     border: rgba(5, 150, 105, 0.8) 1px solid;
@@ -63,8 +64,16 @@ const DateRangeInput = styled.input`
 const SearchField = styled.div`
   align-self: flex-end;
 `;
-const SearchFieldInput = styled(DateRangeInput)``;
-const SearchFieldSubmitButton = styled(Button)``;
+const SearchFieldInput = styled(DateRangeInput)`
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+`;
+const SearchFieldSubmitButton = styled(Button)`
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+`;
 
 /**
  * Multi visualization widget to filter data

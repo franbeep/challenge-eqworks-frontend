@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Chart, registerables } from 'chart.js';
 import { interval, Subject } from 'rxjs';
-import { debounce } from 'rxjs/operators';
+import { debounce, debounceTime } from 'rxjs/operators';
 
 Chart.register(...registerables);
 
@@ -78,7 +78,12 @@ const Canvas = styled.canvas`
   width: 100%;
   height: 100%;
 `;
+
 const subject = new Subject();
+const DEBOUNCE_INTERVAL = 500;
+// create a stream to debounce in case of many refreshes
+const stream = subject.pipe(debounce(() => interval(DEBOUNCE_INTERVAL)));
+stream.subscribe(f => f());
 
 /**
  * Chart component that encapsulates Chart.js with some utilities involving date, gradient and more
@@ -164,28 +169,26 @@ function LineChart({
     };
 
     // destroy previous and create a new one
-    if (chart) {
-      chart.destroy();
+    try {
+      if (chart) {
+        chart.destroy();
+      }
+      const newChart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+      });
+      setChart(newChart);
+    } catch (ex) {
+      // it can occur the the canvas is already in use, so it will fall on this catch
+      console.error(ex);
     }
-    const newChart = new Chart(ctx, {
-      type: 'line',
-      data: chartData,
-    });
-    setChart(newChart);
   };
 
   // update chart every time labels or data change
   React.useEffect(() => {
+    console.log('labels/data/altData changed, updating chart sent');
     subject.next(updateChart);
   }, [labels, data, altData]);
-
-  // create a stream to debounce in case of many refreshes
-  // ...and also create first (empty) chart
-  React.useEffect(() => {
-    const stream = subject.pipe(debounce(() => interval(500)));
-    stream.subscribe(f => f());
-    subject.next(updateChart);
-  }, []);
 
   return (
     <Container>
@@ -207,6 +210,7 @@ LineChart.propTypes = {
     'indigo',
     'purple',
     'pink',
+    'grey',
   ]),
   color: PropTypes.oneOf([
     'red',

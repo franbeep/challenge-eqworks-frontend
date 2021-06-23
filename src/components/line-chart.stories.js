@@ -5,6 +5,13 @@ import LineChart from './line-chart';
 export default {
   title: 'Components/LineChart',
   component: LineChart,
+  decorators: [
+    Story => (
+      <div style={{ maxWidth: '900px' }}>
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 const raw = [

@@ -10,6 +10,13 @@ export default {
     dateRangeUpdated: { action: 'dateRangeUpdated' },
     searchFieldSubmit: { action: 'searchFieldSubmit' },
   },
+  decorators: [
+    Story => (
+      <div style={{ maxWidth: '900px' }}>
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 //
