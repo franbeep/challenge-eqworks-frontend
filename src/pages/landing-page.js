@@ -7,6 +7,7 @@ import Typography from '../components/typography';
 import DataFilter from '../components/data-filter';
 import LineChart from '../components/line-chart';
 import Table, { placeholder } from '../components/table';
+import GeoMap from '../components/geomap';
 
 const Content = styled.div`
   display: flex;
@@ -50,22 +51,16 @@ const createReducer = postDataProcessing => {
         return;
     }
 
-    console.log('state.data');
-    console.log(state.data.slice(0, 1));
-
     newState.data = newState.raw
       .filter(newState.searchWith.filter)
       .sort(newState.orderBy.sort);
 
-    console.log('newState.data');
-    console.log(newState.data.slice(0, 1));
-
     return postDataProcessing(newState);
   };
 };
+
 // initial state
 const initialState = {
-  //
   raw: [],
   labels: [],
   data: [],
@@ -74,8 +69,23 @@ const initialState = {
   searchWith: { filter: () => true },
 };
 
+// default selectors
+const defaultSelectors = [
+  {
+    label: 'Daily',
+    value: 'daily',
+  },
+  {
+    label: 'Hourly',
+    value: 'hourly',
+  },
+];
+
 function LandingPage() {
   const [selector, setSelector] = React.useState('daily');
+  const [range, setRange] = React.useState({ startDate: null, endDate: null });
+
+  // chart state
   const [chartState, chartDispatch] = React.useReducer(
     createReducer(state => {
       // post processing data for chart component
@@ -100,6 +110,7 @@ function LandingPage() {
     }
   );
 
+  // table state
   const [tableState, tableDispatch] = React.useReducer(
     createReducer(state => {
       // post processing data for table component
@@ -139,68 +150,92 @@ function LandingPage() {
     }
   );
 
-  // const [chartRawData, setChartRawData] = React.useState([]);
-  // const [chartError, setChartError] = React.useState(null);
-  // const [tableRawData, setTableRawData] = React.useState([]);
-  // const [tableError, setTableError] = React.useState(null);
-  // const [tableOrderBy, setTableOrderBy] = React.useState('date');
-  // eslint-disable-next-line no-unused-vars
-  const [range, setRange] = React.useState({ startDate: null, endDate: null });
+  // geomap state
+  const [geoMapState, geoMapDispatch] = React.useReducer(
+    createReducer(state => state), // no post processing data treatment
+    initialState
+  );
 
   // chart updates
-  React.useEffect(() => {
-    if (selector == null) return;
+  // React.useEffect(() => {
+  //   if (selector == null) return;
 
-    const params = {
-      startDate: range.startDate
-        ? range.startDate.toLocaleDateString('en-CA')
-        : undefined,
-      endDate: range.endDate
-        ? range.endDate.toLocaleDateString('en-CA')
-        : undefined,
-    };
+  //   const params = {
+  //     startDate: range.startDate
+  //       ? range.startDate.toLocaleDateString('en-CA')
+  //       : undefined,
+  //     endDate: range.endDate
+  //       ? range.endDate.toLocaleDateString('en-CA')
+  //       : undefined,
+  //   };
 
-    axios
-      .get(`${BaseURI}/events/${selector}`, { params })
-      .then(response => {
-        // setChartRawData(response.data);
-        chartDispatch({ inst: 'set/raw', payload: response.data });
-        chartDispatch({ inst: 'set/error', payload: null });
-        // setChartError(null);
-      })
-      .catch(err => {
-        if (!err.response)
-          return chartDispatch({
-            inst: 'set/error',
-            payload: {
-              status: 'Network Unreachable',
-            },
-          });
-        const status = err.response.status;
-        const message = err.response.data.message || err.response.statusText;
-        chartDispatch({
-          inst: 'set/error',
-          payload: {
-            status,
-            message,
-          },
-        });
-      });
-  }, [selector, range]);
+  //   // fetches new data
+  //   axios
+  //     .get(`${BaseURI}/events/${selector}`, { params })
+  //     .then(response => {
+  //       chartDispatch({ inst: 'set/raw', payload: response.data });
+  //       chartDispatch({ inst: 'set/error', payload: null });
+  //     })
+  //     .catch(err => {
+  //       if (!err.response)
+  //         return chartDispatch({
+  //           inst: 'set/error',
+  //           payload: {
+  //             status: 'Network Unreachable',
+  //           },
+  //         });
+  //       const status = err.response.status;
+  //       const message = err.response.data.message || err.response.statusText;
+  //       chartDispatch({
+  //         inst: 'set/error',
+  //         payload: {
+  //           status,
+  //           message,
+  //         },
+  //       });
+  //     });
+  // }, [selector, range]);
 
   // table updates
+  // React.useEffect(() => {
+  //   // fetches new data
+  //   axios
+  //     .get(`${BaseURI}/stats/daily`)
+  //     .then(response => {
+  //       tableDispatch({ inst: 'set/raw', payload: response.data });
+  //       tableDispatch({ inst: 'set/error', payload: null });
+  //     })
+  //     .catch(err => {
+  //       if (!err.response)
+  //         return tableDispatch({
+  //           inst: 'set/error',
+  //           payload: {
+  //             status: 'Network Unreachable',
+  //           },
+  //         });
+  //       const status = err.response.status;
+  //       const message = err.response.data.message || err.response.statusText;
+  //       tableDispatch({
+  //         inst: 'set/error',
+  //         payload: {
+  //           status,
+  //           message,
+  //         },
+  //       });
+  //     });
+  // }, []);
+
+  // geomap updates
   React.useEffect(() => {
     axios
-      .get(`${BaseURI}/stats/daily`)
+      .get(`${BaseURI}/poi`)
       .then(response => {
-        tableDispatch({ inst: 'set/raw', payload: response.data });
-        // setTableRawData(response.data);
-        tableDispatch({ inst: 'set/error', payload: null });
-        // setTableError(null);
+        geoMapDispatch({ inst: 'set/raw', payload: response.data });
+        geoMapDispatch({ inst: 'set/error', payload: null });
       })
       .catch(err => {
         if (!err.response)
-          return tableDispatch({
+          return geoMapDispatch({
             inst: 'set/error',
             payload: {
               status: 'Network Unreachable',
@@ -208,7 +243,7 @@ function LandingPage() {
           });
         const status = err.response.status;
         const message = err.response.data.message || err.response.statusText;
-        tableDispatch({
+        geoMapDispatch({
           inst: 'set/error',
           payload: {
             status,
@@ -229,48 +264,51 @@ function LandingPage() {
     });
   };
 
+  // handler for filtering data by text search
+  const handleTableSearch = searchText => {
+    // filter by search text here
+    console.log('tableDispatch/set/searchWith');
+    tableDispatch({
+      inst: 'set/searchWith',
+      payload: {
+        filter: el =>
+          Object.values(el).some(field => field.includes(searchText)),
+      },
+    });
+  };
+
+  // handler for ordering data by column
+  const handleTableOrderBy = columnName => {
+    // order by column name here
+
+    const dateSort = (a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+
+      if (dateA > dateB) return 1 * tableState.orderBy.asc;
+      else return -1 * tableState.orderBy.asc;
+    };
+
+    console.log('tableDispatch/set/orderBy');
+    tableDispatch({
+      inst: 'set/orderBy',
+      payload: {
+        sort:
+          columnName === 'date'
+            ? dateSort
+            : (a, b) => {
+                if (a[columnName] > b[columnName])
+                  return 1 * tableState.orderBy.asc;
+                else return -1 * tableState.orderBy.asc;
+              },
+        asc: tableState.orderBy.asc * -1,
+      },
+    });
+  };
+
   // handler for selecting a date
   const handleDateRangeChanged = ({ startDate, endDate }) =>
     setRange({ startDate, endDate });
-
-  // processes the raw data into labels and data
-  // let chartData = [],
-  //   chartLabels = [];
-  // let tableData = [],
-  //   tableLabels = [];
-
-  // ...chart data processing
-  // switch (selector) {
-  //   case 'daily':
-  //     chartLabels = chartRawData.map(
-  //       d => `${new Date(d.date).toLocaleDateString('en-US')}`
-  //     );
-  //     chartData = chartRawData.map(d => d.events);
-  //     break;
-  //   case 'hourly':
-  //     chartLabels = chartRawData.map(d => `${d.hour}h`);
-  //     chartData = chartRawData.map(d => d.events);
-  //     break;
-  //   default:
-  //     break;
-  // }
-
-  // ...table data processing
-  // if (tableRawData.length > 0) {
-  //   tableLabels = Object.keys(tableRawData[0]).map(key => ({
-  //     label: key.replace(/([A-Z])/g, ' $1'),
-  //     key,
-  //   }));
-  //   tableData = tableRawData.map(item => [
-  //     new Date(item.date).toLocaleDateString('en-US'),
-  //     item.impressions,
-  //     item.clicks,
-  //     parseFloat(item.revenue).toFixed(2),
-  //   ]);
-  // } else {
-  //   tableLabels = placeholder.labels;
-  //   tableData = placeholder.data;
-  // }
 
   return (
     <Layout>
@@ -284,16 +322,7 @@ function LandingPage() {
 
           <DataFilter
             actualSelector={selector}
-            selectors={[
-              {
-                label: 'Daily',
-                value: 'daily',
-              },
-              {
-                label: 'Hourly',
-                value: 'hourly',
-              },
-            ]}
+            selectors={defaultSelectors}
             selectorPressed={handleSelectorSelected}
             dateRange
             dateRangeUpdated={handleDateRangeChanged}
@@ -312,51 +341,23 @@ function LandingPage() {
           <Typography type="title" style={{ marginBottom: '1em' }}>
             Table Visualization
           </Typography>
-          <DataFilter
-            searchField
-            searchFieldSubmit={searchText => {
-              // filter by search text here
-              console.log('tableDispatch/set/searchWith');
-              tableDispatch({
-                inst: 'set/searchWith',
-                payload: {
-                  filter: el =>
-                    Object.values(el).some(field => field.includes(searchText)),
-                },
-              });
-            }}
-          />
+          <DataFilter searchField searchFieldSubmit={handleTableSearch} />
           <Table
             labels={tableState.labels}
             data={tableState.data}
-            dispatchOrderBy={columnName => {
-              // order by column name here
-
-              const dateSort = (a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-
-                if (dateA > dateB) return 1 * tableState.orderBy.asc;
-                else return -1 * tableState.orderBy.asc;
-              };
-
-              console.log('tableDispatch/set/orderBy');
-              tableDispatch({
-                inst: 'set/orderBy',
-                payload: {
-                  sort:
-                    columnName === 'date'
-                      ? dateSort
-                      : (a, b) => {
-                          if (a[columnName] > b[columnName])
-                            return 1 * tableState.orderBy.asc;
-                          else return -1 * tableState.orderBy.asc;
-                        },
-                  asc: tableState.orderBy.asc * -1,
-                },
-              });
-            }}
+            dispatchOrderBy={handleTableOrderBy}
             error={tableState.error}
+          />
+        </Section>
+
+        <Section>
+          <Typography type="title" style={{ marginBottom: '1em' }}>
+            Geolocation Map Visualization
+          </Typography>
+
+          <GeoMap
+            data={geoMapState.data}
+            style={{ width: '100%', height: '500px' }}
           />
         </Section>
       </Content>

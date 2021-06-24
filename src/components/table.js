@@ -140,19 +140,23 @@ function Table({
 
   return (
     <Container>
-      <SubContainer style={{ filter: Boolean(error) ? 'blur(4px)' : '' }}>
+      <SubContainer
+        style={{
+          transition: '0.2s',
+          filter: Boolean(error) ? 'blur(4px)' : '',
+        }}
+      >
         <Header>
           <Row>{header}</Row>
         </Header>
         <Body>{rows}</Body>
       </SubContainer>
-      {error && (
-        <ErrorModal>
-          <Typography type="title">{error.status}</Typography>
-          <Typography type="paragraph">{error.message}</Typography>
-        </ErrorModal>
-      )}
-      <PaginationDiv>
+      <PaginationDiv
+        style={{
+          transition: '0.2s',
+          filter: Boolean(error) ? 'blur(4px)' : '',
+        }}
+      >
         <PaginationController
           onClick={() => {
             setPage(page - 1);
@@ -173,6 +177,12 @@ function Table({
           »
         </PaginationController>
       </PaginationDiv>
+      {error && (
+        <ErrorModal>
+          <Typography type="title">{error.status}</Typography>
+          <Typography type="paragraph">{error.message}</Typography>
+        </ErrorModal>
+      )}
     </Container>
   );
 }
