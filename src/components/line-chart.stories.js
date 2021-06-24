@@ -1,5 +1,3 @@
-// YourComponent.stories.js
-
 import LineChart from './line-chart';
 
 export default {

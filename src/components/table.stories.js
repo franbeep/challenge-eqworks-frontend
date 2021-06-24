@@ -1,5 +1,4 @@
 import Table, { placeholder } from './table';
-// import moment from 'moment';
 
 export default {
   title: 'Components/Table',
@@ -177,20 +176,11 @@ const raw = [
   },
 ];
 
-// {
-//   date: '2017-01-01T05:00:00.000Z',
-//   hour: 23,
-//   impressions: 17819,
-//   clicks: 24,
-//   revenue: '94.0077160000000',
-// },
-
 const labels = Object.keys(raw[0]).map(key => ({
   label: key.replace(/([A-Z])/g, ' $1'),
   key,
 }));
 const dataOne = raw.map(item => [
-  // moment(new Date(item.date)).format('D MMMM YYYY'),
   new Date(item.date).toLocaleDateString('en-US'),
   item.hour,
   item.impressions,

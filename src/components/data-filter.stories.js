@@ -1,5 +1,3 @@
-// YourComponent.stories.js
-
 import DateFilter from './data-filter';
 
 export default {
@@ -18,8 +16,6 @@ export default {
     ),
   ],
 };
-
-//
 
 const Template = args => <DateFilter {...args} />;
 
@@ -44,7 +40,6 @@ OnlyTypeSelectors.args = {
       value: 'monthly',
     },
   ],
-  // selectorPressed: () => {},
 };
 
 export const OnlyDateRange = Template.bind({});

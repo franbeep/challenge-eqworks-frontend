@@ -1,17 +1,8 @@
-// YourComponent.stories.js
-
 import GeoMap from './geomap';
 
 export default {
   title: 'Components/GeoMap',
   component: GeoMap,
-  // decorators: [
-  //   Story => (
-  //     <div style={{ maxWidth: '900px', height: '600px', background: 'black' }}>
-  //       <Story />
-  //     </div>
-  //   ),
-  // ],
 };
 
 const raw = [
@@ -24,7 +15,6 @@ const raw = [
 const Template = args => <GeoMap {...args} />;
 
 export const Default = Template.bind({});
-
 Default.args = {
   data: raw,
   style: {

@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import '@fontsource/roboto';
 
 import Typography from './typography';
+import '@fontsource/roboto';
 
 const Container = styled.div`
   display: flex;
@@ -38,7 +38,6 @@ const HeaderData = styled.th`
   }
 `;
 const Body = styled.tbody`
-  //
   color: rgba(0, 0, 0, 0.7);
   tr:nth-child(2n) {
     background-color: rgba(0, 0, 0, 0.02);
@@ -50,12 +49,8 @@ const Body = styled.tbody`
     }
   }
 `;
-const Row = styled.tr`
-  //
-`;
-const Data = styled.td`
-  //
-`;
+const Row = styled.tr``;
+const Data = styled.td``;
 const ErrorModal = styled.div`
   position: absolute;
   border-radius: 4px;
@@ -103,20 +98,13 @@ export const placeholder = {
   ],
 };
 
+const maxPerPage = 10;
+
 /**
  * Table component for data visualization
  */
-function Table({
-  labels,
-  data,
-  dispatchOrderBy = data => {
-    console.log(`${data} pressed`);
-  },
-  error,
-}) {
+function Table({ labels, data, dispatchOrderBy, error }) {
   const [page, setPage] = React.useState(1);
-  const [maxPerPage, setMaxPerPage] = React.useState(10);
-
   const pagesNumber = Math.ceil(data.length / maxPerPage);
 
   const header = labels.map((item, index) => (
@@ -128,6 +116,7 @@ function Table({
       {item.label} <span style={{ color: 'rgba(0,0,0,0.4)' }}>⇅</span>
     </HeaderData>
   ));
+
   const rows = data
     .slice((page - 1) * maxPerPage, page * maxPerPage)
     .map((values, row) => (

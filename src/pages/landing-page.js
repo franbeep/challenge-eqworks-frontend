@@ -24,9 +24,8 @@ const Section = styled.div`
   margin-bottom: 1em;
 `;
 
-const BaseURI = `http://127.0.0.12:5555`;
 // backend
-// const BaseURI = `https://lucky-neat-bamboo.glitch.me`;
+const BaseURI = `https://lucky-neat-bamboo.glitch.me`;
 
 // reducer for data management
 const createReducer = postDataProcessing => {
@@ -81,6 +80,9 @@ const defaultSelectors = [
   },
 ];
 
+/**
+ * Landing Page Component to aggregate and show most or all developed components
+ */
 function LandingPage() {
   const [selector, setSelector] = React.useState('daily');
   const [range, setRange] = React.useState({ startDate: null, endDate: null });
@@ -157,73 +159,73 @@ function LandingPage() {
   );
 
   // chart updates
-  // React.useEffect(() => {
-  //   if (selector == null) return;
+  React.useEffect(() => {
+    if (selector == null) return;
 
-  //   const params = {
-  //     startDate: range.startDate
-  //       ? range.startDate.toLocaleDateString('en-CA')
-  //       : undefined,
-  //     endDate: range.endDate
-  //       ? range.endDate.toLocaleDateString('en-CA')
-  //       : undefined,
-  //   };
+    const params = {
+      startDate: range.startDate
+        ? range.startDate.toLocaleDateString('en-CA')
+        : undefined,
+      endDate: range.endDate
+        ? range.endDate.toLocaleDateString('en-CA')
+        : undefined,
+    };
 
-  //   // fetches new data
-  //   axios
-  //     .get(`${BaseURI}/events/${selector}`, { params })
-  //     .then(response => {
-  //       chartDispatch({ inst: 'set/raw', payload: response.data });
-  //       chartDispatch({ inst: 'set/error', payload: null });
-  //     })
-  //     .catch(err => {
-  //       if (!err.response)
-  //         return chartDispatch({
-  //           inst: 'set/error',
-  //           payload: {
-  //             status: 'Network Unreachable',
-  //           },
-  //         });
-  //       const status = err.response.status;
-  //       const message = err.response.data.message || err.response.statusText;
-  //       chartDispatch({
-  //         inst: 'set/error',
-  //         payload: {
-  //           status,
-  //           message,
-  //         },
-  //       });
-  //     });
-  // }, [selector, range]);
+    // fetches new data
+    axios
+      .get(`${BaseURI}/events/${selector}`, { params })
+      .then(response => {
+        chartDispatch({ inst: 'set/raw', payload: response.data });
+        chartDispatch({ inst: 'set/error', payload: null });
+      })
+      .catch(err => {
+        if (!err.response)
+          return chartDispatch({
+            inst: 'set/error',
+            payload: {
+              status: 'Network Unreachable',
+            },
+          });
+        const status = err.response.status;
+        const message = err.response.data.message || err.response.statusText;
+        chartDispatch({
+          inst: 'set/error',
+          payload: {
+            status,
+            message,
+          },
+        });
+      });
+  }, [selector, range]);
 
   // table updates
-  // React.useEffect(() => {
-  //   // fetches new data
-  //   axios
-  //     .get(`${BaseURI}/stats/daily`)
-  //     .then(response => {
-  //       tableDispatch({ inst: 'set/raw', payload: response.data });
-  //       tableDispatch({ inst: 'set/error', payload: null });
-  //     })
-  //     .catch(err => {
-  //       if (!err.response)
-  //         return tableDispatch({
-  //           inst: 'set/error',
-  //           payload: {
-  //             status: 'Network Unreachable',
-  //           },
-  //         });
-  //       const status = err.response.status;
-  //       const message = err.response.data.message || err.response.statusText;
-  //       tableDispatch({
-  //         inst: 'set/error',
-  //         payload: {
-  //           status,
-  //           message,
-  //         },
-  //       });
-  //     });
-  // }, []);
+  React.useEffect(() => {
+    // fetches new data
+    axios
+      .get(`${BaseURI}/stats/daily`)
+      .then(response => {
+        tableDispatch({ inst: 'set/raw', payload: response.data });
+        tableDispatch({ inst: 'set/error', payload: null });
+      })
+      .catch(err => {
+        if (!err.response)
+          return tableDispatch({
+            inst: 'set/error',
+            payload: {
+              status: 'Network Unreachable',
+            },
+          });
+        const status = err.response.status;
+        const message = err.response.data.message || err.response.statusText;
+        tableDispatch({
+          inst: 'set/error',
+          payload: {
+            status,
+            message,
+          },
+        });
+      });
+  }, []);
 
   // geomap updates
   React.useEffect(() => {
@@ -267,7 +269,6 @@ function LandingPage() {
   // handler for filtering data by text search
   const handleTableSearch = searchText => {
     // filter by search text here
-    console.log('tableDispatch/set/searchWith');
     tableDispatch({
       inst: 'set/searchWith',
       payload: {
@@ -289,7 +290,6 @@ function LandingPage() {
       else return -1 * tableState.orderBy.asc;
     };
 
-    console.log('tableDispatch/set/orderBy');
     tableDispatch({
       inst: 'set/orderBy',
       payload: {

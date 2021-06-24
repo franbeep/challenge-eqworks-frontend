@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import {
   MapContainer,
@@ -6,6 +5,7 @@ import {
   Marker,
   Popup,
 } from '@monsonjeremy/react-leaflet';
+
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
 import 'leaflet-defaulticon-compatibility';

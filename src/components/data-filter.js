@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 import { interval, Subject } from 'rxjs';
 import { debounce } from 'rxjs/operators';
+
 import 'react-datepicker/dist/react-datepicker.css';
 import '@fontsource/roboto';
 
@@ -67,15 +68,10 @@ const SearchField = styled.div`
   align-self: flex-end;
 `;
 const SearchFieldInput = styled(DateRangeInput)``;
-const SearchFieldSubmitButton = styled(Button)`
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-`;
 
 const subject = new Subject();
-const DEBOUNCE_INTERVAL = 100;
-// create a stream to debounce in case of many refreshes
-const stream = subject.pipe(debounce(() => interval(DEBOUNCE_INTERVAL)));
+// create a stream of functions to debounce in case of many refreshes
+const stream = subject.pipe(debounce(() => interval(100)));
 stream.subscribe(f => f());
 
 /**
@@ -85,13 +81,12 @@ function DataFilter({
   actualSelector,
   selectors = [],
   selectorPressed,
-  dateRange = false,
   dateRangeUpdated,
-  searchField = false,
   searchFieldSubmit,
+  dateRange = false,
+  searchField = false,
   selectsRange = true,
 }) {
-  const [search, setSearch] = React.useState('');
   const [startDate, setStartDate] = React.useState(null);
   const [endDate, setEndDate] = React.useState(null);
 
@@ -112,6 +107,7 @@ function DataFilter({
   // handler for selector pressed
   const handleSelectClick = evt => selectorPressed(evt.target.value);
 
+  // selector buttons
   const buttons = selectors.map((selector, index) => {
     return (
       <Button

@@ -95,9 +95,8 @@ const ErrorModal = styled.div`
 `;
 
 const subject = new Subject();
-const DEBOUNCE_INTERVAL = 150;
-// create a stream to debounce in case of many refreshes
-const stream = subject.pipe(debounce(() => interval(DEBOUNCE_INTERVAL)));
+// create a stream of functions to debounce in case of many refreshes
+const stream = subject.pipe(debounce(() => interval(150)));
 stream.subscribe(f => f());
 
 /**
@@ -107,10 +106,10 @@ function LineChart({
   pointLabel,
   labels,
   data,
-  altData = null,
   color,
-  altColor = 'grey',
   dashed = false,
+  altData = null,
+  altColor = 'grey',
   error,
 }) {
   const chartRef = React.useRef(null);
@@ -124,6 +123,7 @@ function LineChart({
     // first dataset
     {
       const { colorValue, gradientFrom, gradientTo } = getColorSet(color);
+      // setup the gradient
       const gradient = ctx.createLinearGradient(0, 0, 0, 400);
       gradient.addColorStop(0, gradientFrom);
       gradient.addColorStop(1, gradientTo);
@@ -151,9 +151,10 @@ function LineChart({
       });
     }
 
-    // second dataset, if any
+    // if second dataset...
     if (altData) {
       const { colorValue, gradientFrom, gradientTo } = getColorSet(altColor);
+      // setup the gradient
       const gradient = ctx.createLinearGradient(0, 0, 0, 400);
       gradient.addColorStop(0, gradientFrom);
       gradient.addColorStop(1, gradientTo);
@@ -195,14 +196,14 @@ function LineChart({
       });
       setChart(newChart);
     } catch (ex) {
-      // it can occur the the canvas is already in use, so it will fall on this catch
+      // it can occur the the canvas is already in use,
+      // so it will fall on this catch
       console.error(ex);
     }
   };
 
-  // update chart every time labels or data change
+  // (debounced) update chart every time labels or data change
   React.useEffect(() => {
-    console.log('labels/data/altData changed, updating chart sent');
     subject.next(updateChart);
   }, [labels, data, altData]);
 
