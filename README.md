@@ -39,6 +39,7 @@
 
 <h2>Screenshots</h2>
 
-<img alt="Netlify Status" src="screenshots/desktop.jpg" width="500">
+<img alt="Screenshot 1" src="screenshots/desktop.jpg" width="500">
+<img alt="Screenshot 2" src="screenshots/desktop2.png" width="500">
 
 <h3>Thanks! ❤️</h3>
